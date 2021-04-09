@@ -1,7 +1,7 @@
 #include <new>
 #include <cerrno>
 
-int printk(const char* format, ...);
+extern "C" int printk(const char* format, ...);
 
 std::new_handler std::get_new_handler() noexcept {
   return [] {

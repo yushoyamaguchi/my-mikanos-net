@@ -1,5 +1,4 @@
 -I/home/pandax381/osbook/devenv/x86_64-elf/include/c++/v1
--I/home/pandax381/osbook/devenv/x86_64-elf/include/freetype2
 -I/home/pandax381/osbook/devenv/x86_64-elf/include
 -nostdlibinc
 -D__ELF__
@@ -14,4 +13,4 @@
 -fno-exceptions
 -ffreestanding
 -fno-rtti
--std=c++17
+-std=c99
