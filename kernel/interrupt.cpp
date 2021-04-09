@@ -40,6 +40,12 @@ namespace {
     NotifyEndOfInterrupt();
   }
 
+  __attribute__((interrupt))
+  void IntHandlerE1000(InterruptFrame* frame) {
+    task_manager->SendMessage(1, Message{Message::kInterruptE1000});
+    NotifyEndOfInterrupt();
+  }
+
   void PrintHex(uint64_t value, int width, Vector2D<int> pos) {
     for (int i = 0; i < width; ++i) {
       int x = (value >> 4 * (width - i - 1)) & 0xfu;
@@ -139,6 +145,7 @@ void InitializeInterrupt() {
                           true /* present */, kISTForTimer /* IST */),
               reinterpret_cast<uint64_t>(IntHandlerLAPICTimer),
               kKernelCS);
+  set_idt_entry(InterruptVector::kE1000, IntHandlerE1000);
   set_idt_entry(0,  IntHandlerDE);
   set_idt_entry(1,  IntHandlerDB);
   set_idt_entry(3,  IntHandlerBP);

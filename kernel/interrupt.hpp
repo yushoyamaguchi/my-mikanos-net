@@ -61,6 +61,7 @@ class InterruptVector {
   enum Number {
     kXHCI = 0x40,
     kLAPICTimer = 0x41,
+    kE1000 = 0x42,
   };
 };
 

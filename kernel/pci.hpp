@@ -61,6 +61,10 @@ namespace pci {
     return ReadVendorId(dev.bus, dev.device, dev.function);
   }
 
+  inline uint16_t ReadDeviceId(const Device& dev) {
+    return ReadDeviceId(dev.bus, dev.device, dev.function);
+  }
+
   /** @brief 指定された PCI デバイスの 32 ビットレジスタを読み取る */
   uint32_t ReadConfReg(const Device& dev, uint8_t reg_addr);
   /** @brief 指定された PCI デバイスの 32 ビットレジスタに書き込む */

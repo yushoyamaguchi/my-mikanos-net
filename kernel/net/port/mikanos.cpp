@@ -7,8 +7,11 @@
 #include "task.hpp"
 #include "timer.hpp"
 #include "logger.hpp"
+#include "pci.hpp"
+#include "interrupt.hpp"
 
 #include "net/util.h"
+#include "net/driver/e1000.h"
 
 void
 flockfile(FILE *fp)
@@ -149,4 +152,26 @@ void
 softirq(void)
 {
     // TODO: implement
+}
+
+void
+e1000_probe(void)
+{
+    for (int i = 0; i < pci::num_device; ++i) {
+        if (pci::ReadVendorId(pci::devices[i]) != 0x8086 || pci::ReadDeviceId(pci::devices[i]) != 0x10d3) {
+            continue;
+        }
+        pci::Device *dev = &pci::devices[i];
+        debugf("found: %d.%d.%d", dev->bus, dev->device, dev->function);
+        // MMIO Base Address
+        const WithError<uint64_t> bar = pci::ReadBar(*dev, 0);
+        uintptr_t mmio_base = bar.value & ~static_cast<uint64_t>(0xf);
+        debugf("mmio_base = 0x%08x", mmio_base);
+        // Register MSI
+        const uint8_t bsp_local_apic_id = *reinterpret_cast<const uint32_t*>(0xfee00020) >> 24;
+        pci::ConfigureMSIFixedDestination(
+            *dev, bsp_local_apic_id, pci::MSITriggerMode::kLevel, pci::MSIDeliveryMode::kFixed, InterruptVector::kE1000, 0);
+        debugf("msi registered, irq = %d", InterruptVector::kE1000);
+        e1000_init(mmio_base);
+    }
 }
