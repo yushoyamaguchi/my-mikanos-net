@@ -26,3 +26,6 @@ define_syscall OpenFile,         0x8000000c
 define_syscall ReadFile,         0x8000000d
 define_syscall DemandPages,      0x8000000e
 define_syscall MapFile,          0x8000000f
+define_syscall SocketOpen,       0x80000010
+define_syscall SocketClose,      0x80000011
+define_syscall SocketIOCTL,      0x80000012

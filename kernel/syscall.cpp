@@ -16,6 +16,8 @@
 #include "keyboard.hpp"
 #include "app_event.hpp"
 
+#include "net/socket.h"
+
 namespace syscall {
   struct Result {
     uint64_t value;
@@ -395,13 +397,30 @@ SYSCALL(MapFile) {
   return { vaddr_begin, 0 };
 }
 
+SYSCALL(SocketOpen) {
+  uint64_t ret = socketopen((int)arg1, (int)arg2, (int)arg3);
+  return {ret, 0};
+}
+
+SYSCALL(SocketClose) {
+  struct socket *s = socketget((int)arg1);
+  uint64_t ret = socketclose(s);
+  return {ret, 0};
+}
+
+SYSCALL(SocketIOCTL) {
+  struct socket soc = {0, (int)arg1};
+  uint64_t ret = socketioctl(&soc, (int)arg2, (void *)arg3);
+  return {ret, 0};
+}
+
 #undef SYSCALL
 
 } // namespace syscall
 
 using SyscallFuncType = syscall::Result (uint64_t, uint64_t, uint64_t,
                                          uint64_t, uint64_t, uint64_t);
-extern "C" std::array<SyscallFuncType*, 0x10> syscall_table{
+extern "C" std::array<SyscallFuncType*, 0x13> syscall_table{
   /* 0x00 */ syscall::LogString,
   /* 0x01 */ syscall::PutString,
   /* 0x02 */ syscall::Exit,
@@ -418,6 +437,9 @@ extern "C" std::array<SyscallFuncType*, 0x10> syscall_table{
   /* 0x0d */ syscall::ReadFile,
   /* 0x0e */ syscall::DemandPages,
   /* 0x0f */ syscall::MapFile,
+  /* 0x10 */ syscall::SocketOpen,
+  /* 0x11 */ syscall::SocketClose,
+  /* 0x12 */ syscall::SocketIOCTL,
 };
 
 void InitializeSyscall() {
