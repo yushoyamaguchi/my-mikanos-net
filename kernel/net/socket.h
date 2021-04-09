@@ -74,6 +74,22 @@ extern int
 socketclose(struct socket *s);
 extern int
 socketioctl(struct socket *s, int req, void *arg);
+extern int
+socketrecvfrom(struct socket *s, char *buf, int n, struct sockaddr *addr, int *addrlen);
+extern int
+socketsendto(struct socket *s, char *buf, int n, struct sockaddr *addr, int addrlen);
+extern int
+socketbind(struct socket *s, struct sockaddr *addr, int addrlen);
+extern int
+socketlisten(struct socket*, int);
+extern int
+socketaccept(struct socket*, struct sockaddr*, int*);
+extern int
+socketconnect(struct socket*, struct sockaddr*, int);
+extern int
+socketrecv(struct socket*, char*, int);
+extern int
+socketsend(struct socket*, char*, int);
 
 #ifdef __cplusplus
 }

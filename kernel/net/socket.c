@@ -6,6 +6,8 @@
 #include "util.h"
 #include "net.h"
 #include "ip.h"
+#include "udp.h"
+#include "tcp.h"
 
 static struct socket sockets[128];
 
@@ -49,10 +51,10 @@ socketopen(int domain, int type, int protocol)
     s->type = type;
     switch (s->type) {
     case SOCK_STREAM:
-        s->desc = 0;
+        s->desc = tcp_open();
         break;
     case SOCK_DGRAM:
-        s->desc = 0;
+        s->desc = udp_open();
         break;
     }
     if (s->desc == -1) {
@@ -66,8 +68,10 @@ socketclose(struct socket *s)
 {
     switch (s->type) {
     case SOCK_STREAM:
+        tcp_close(s->desc);
         break;    
     case SOCK_DGRAM:
+        udp_close(s->desc);
         break;
     default:
         return -1;
@@ -244,4 +248,152 @@ socketioctl(struct socket *s, int req, void *arg)
         return -1;
     }
     return 0;
+}
+
+int
+socketrecvfrom(struct socket *s, char *buf, int n, struct sockaddr *addr, int *addrlen)
+{
+    struct udp_endpoint ep;
+    int ret;
+
+    if (s->type != SOCK_DGRAM) {
+        return -1;
+    }
+    switch (s->family) {
+    case AF_INET:
+        ret = udp_recvfrom(s->desc, (uint8_t *)buf, n, &ep);
+        if (ret != -1) {
+            ((struct sockaddr_in *)addr)->sin_addr = ep.addr;
+            ((struct sockaddr_in *)addr)->sin_port = ep.port;
+        }
+        return ret;
+    }
+    return -1;
+}
+
+int
+socketsendto(struct socket *s, char *buf, int n, struct sockaddr *addr, int addrlen)
+{
+    struct udp_endpoint ep;
+
+    if (s->type != SOCK_DGRAM) {
+        return -1;
+    }
+    switch (s->family) {
+    case AF_INET:
+        ep.addr = ((struct sockaddr_in *)addr)->sin_addr;
+        ep.port = ((struct sockaddr_in *)addr)->sin_port;
+        return udp_sendto(s->desc, (uint8_t *)buf, n, &ep);
+    }
+    return -1;
+}
+
+int
+socketbind(struct socket *s, struct sockaddr *addr, int addrlen)
+{
+    struct tcp_endpoint tcp_ep;
+    struct udp_endpoint udp_ep;
+
+    switch (s->type) {
+    case SOCK_STREAM:
+        switch (s->family) {
+        case AF_INET:
+            tcp_ep.addr = ((struct sockaddr_in *)addr)->sin_addr;
+            tcp_ep.port = ((struct sockaddr_in *)addr)->sin_port;
+            return tcp_bind(s->desc, &tcp_ep);
+        }
+        return -1;
+    case SOCK_DGRAM:
+        switch (s->family) {
+        case AF_INET:
+            udp_ep.addr = ((struct sockaddr_in *)addr)->sin_addr;
+            udp_ep.port = ((struct sockaddr_in *)addr)->sin_port;
+            return udp_bind(s->desc, &udp_ep);
+        }
+        return -1;
+    }
+    return -1;
+}
+
+int
+socketlisten(struct socket *s, int backlog)
+{
+    if (s->type != SOCK_STREAM) {
+        return -1;
+    }
+    switch (s->family) {
+    case AF_INET:
+        return tcp_listen(s->desc, backlog);
+    }
+    return -1;
+}
+
+int
+socketaccept(struct socket *s, struct sockaddr *addr, int *addrlen)
+{
+    struct tcp_endpoint ep;
+    int ret;
+    struct socket *new_s;
+
+    if (s->type != SOCK_STREAM) {
+        return -1;
+    }
+    switch (s->family) {
+    case AF_INET:
+        ret = tcp_accept(s->desc, &ep);
+        if (ret == -1) {
+            return -1;
+        }
+        ((struct sockaddr_in *)addr)->sin_addr = ep.addr;
+        ((struct sockaddr_in *)addr)->sin_port = ep.port;
+        new_s = socketalloc();
+        new_s->family = s->family;
+        new_s->type = s->type;
+        new_s->desc = ret;
+        return indexof(sockets, new_s);
+    }
+    return -1;
+}
+
+int
+socketconnect(struct socket *s, struct sockaddr *addr, int addrlen)
+{
+    struct tcp_endpoint tcp_ep;
+
+    if (s->type != SOCK_STREAM) {
+        return -1;
+    }
+    switch (s->family) {
+    case AF_INET:
+        tcp_ep.addr = ((struct sockaddr_in *)addr)->sin_addr;
+        tcp_ep.port = ((struct sockaddr_in *)addr)->sin_port;
+        return tcp_connect(s->desc, &tcp_ep);
+    }
+    return -1;
+}
+
+int
+socketrecv(struct socket *s, char *buf, int n)
+{
+    if (s->type != SOCK_STREAM) {
+        return -1;
+    }
+    switch (s->family) {
+    case AF_INET:
+        return tcp_receive(s->desc, (uint8_t *)buf, n);
+    }
+    return -1;
+}
+
+int
+socketsend(struct socket *s, char *buf, int n)
+{
+    if (s->type != SOCK_STREAM) {
+        return -1;
+    }
+    switch (s->family) {
+    case AF_INET:
+        return tcp_send(s->desc, (uint8_t *)buf, n);
+    }
+    return -1;
 }

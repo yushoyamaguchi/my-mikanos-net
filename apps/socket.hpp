@@ -85,6 +85,22 @@ socket(int domain, int type, int protocol);
 extern int
 soclose(int soc);
 #define close soclose
+extern int
+recvfrom(int soc, char *buf, size_t size, struct sockaddr *addr, int *salen);
+extern int
+sendto(int soc, char *buf, size_t size, struct sockaddr *addr, int salen);
+extern int
+bind(int soc, struct sockaddr *addr, int salen);
+extern int
+listen(int soc, int backlog);
+extern int
+accept(int soc, struct sockaddr *addr, int *salen);
+extern int
+connect(int soc, struct sockaddr *addr, int salen);
+extern int
+recv(int soc, char *buf, size_t size);
+extern int
+send(int soc, char *buf, size_t size);
 
 #ifdef __cplusplus
 }

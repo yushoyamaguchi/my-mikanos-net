@@ -126,3 +126,66 @@ soclose(int soc)
     SyscallSocketClose(soc);
     return 0;
 }
+
+int
+recvfrom(int soc, char *buf, size_t size, struct sockaddr *addr, int *salen)
+{
+    auto [ret, err] = SyscallSocketRecvFrom(soc, buf, size, addr, salen);
+
+    return ret;
+}
+
+int
+sendto(int soc, char *buf, size_t size, struct sockaddr *addr, int salen)
+{
+    auto [ret, err] = SyscallSocketSendTo(soc, buf, size, addr, salen);
+
+    return ret;
+}
+
+int
+bind(int soc, struct sockaddr *addr, int salen)
+{
+    auto [ret, err] = SyscallSocketBind(soc, addr, salen);
+
+    return ret;
+}
+
+int
+listen(int soc, int backlog)
+{
+    auto [ret, err] = SyscallSocketListen(soc, backlog);
+    return ret;
+}
+
+int
+accept(int soc, struct sockaddr *addr, int *salen)
+{
+    auto [ret, err] = SyscallSocketAccept(soc, addr, salen);
+
+    return ret;
+}
+
+int
+connect(int soc, struct sockaddr *addr, int salen)
+{
+    auto [ret, err] = SyscallSocketConnect(soc, addr, salen);
+
+    return ret;
+}
+
+int
+recv(int soc, char *buf, size_t size)
+{
+    auto [ret, err] = SyscallSocketRecv(soc, buf, size);
+
+    return ret;
+}
+
+int
+send(int soc, char *buf, size_t size)
+{
+    auto [ret, err] = SyscallSocketSend(soc, buf, size);
+
+    return ret;
+}

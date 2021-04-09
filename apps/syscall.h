@@ -46,6 +46,14 @@ struct SyscallResult SyscallMapFile(int fd, size_t* file_size, int flags);
 struct SyscallResult SyscallSocketOpen(int domain, int type, int protocol);
 struct SyscallResult SyscallSocketClose(int soc);
 struct SyscallResult SyscallSocketIOCTL(int soc, int req, void *arg);
+struct SyscallResult SyscallSocketRecvFrom(int soc, char *buf, int n, struct sockaddr *addr, int *addrlen);
+struct SyscallResult SyscallSocketSendTo(int soc, char *buf, int n, struct sockaddr *addr, int addrlen);
+struct SyscallResult SyscallSocketBind(int soc, struct sockaddr *addr, int addrlen);
+struct SyscallResult SyscallSocketListen(int soc, int backlog);
+struct SyscallResult SyscallSocketAccept(int soc, struct sockaddr *peer, int *peerlen);
+struct SyscallResult SyscallSocketConnect(int soc, struct sockaddr *addr, int addrlen);
+struct SyscallResult SyscallSocketRecv(int soc, char *buf, int n);
+struct SyscallResult SyscallSocketSend(int soc, char *buf, int n);
 
 #ifdef __cplusplus
 } // extern "C"
