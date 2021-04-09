@@ -1,3 +1,49 @@
+# MikanOS-Net
+
+MikanOS にネットワーク機能を追加した改造版です。
+
+プロトコルスタックは https://github.com/pandax381/microps を移植しています。
+
+## 事前準備
+
+### QEMUの起動起動オプションにNICの設定を追加
+
+$HOME/osbook/devenv/run_image.sh
+```
+...
+qemu-system-x86_64 \
+    -m 1G \
+    -drive if=pflash,format=raw,readonly,file=$DEVENV_DIR/OVMF_CODE.fd \
+    -drive if=pflash,format=raw,file=$DEVENV_DIR/OVMF_VARS.fd \
+    -drive if=ide,index=0,media=disk,format=raw,file=$DISK_IMG \
+    -device nec-usb-xhci,id=xhci \
+    -device usb-mouse -device usb-kbd \
++   -nic tap,ifname=tap0,model=e1000e,script=no,downscript=no \
+    -monitor stdio \
+    $QEMU_OPTS
+```
+
+### Tapデバイスの作成
+
+```
+$ sudo ip tuntap add mode tap user $USER name tap0
+$ sudo ip addr add 192.0.2.1/24 dev tap0
+$ sudo ip link set tap0 up
+```
+
+## ビルド＆起動
+
+オリジナルの MikanOS と同じ手順です。
+```
+$ ./build.sh run
+```
+
+## アプリケーション
+
++ ifconfig
++ udps
++ tcps
+
 # MikanOS
 
 MikanOS はレガシーフリーなアーキテクチャ（UEFI BIOS、Intel 64 モード）で動作する教育用オペレーティングシステムです。
