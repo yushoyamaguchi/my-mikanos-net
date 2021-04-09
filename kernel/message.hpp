@@ -16,6 +16,7 @@ struct Message {
     kPipe,
     kWindowClose,
     kInterruptE1000,
+    kNetInput,
   } type;
 
   uint64_t src_task;

@@ -219,6 +219,10 @@ extern "C" void KernelMainNewStack(
   timer_manager->AddTimer(Timer{kTimer05Sec, kTextboxCursorTimer, 1});
   bool textbox_cursor_visible = false;
 
+  const int kNetTimer = 2;
+  const int kTimer01Sec = static_cast<int>(kTimerFreq * 0.1);
+  timer_manager->AddTimer(Timer{kTimer01Sec, kNetTimer, 1});
+
   InitializeSyscall();
 
   InitializeTask();
@@ -276,6 +280,12 @@ extern "C" void KernelMainNewStack(
         textbox_cursor_visible = !textbox_cursor_visible;
         DrawTextCursor(textbox_cursor_visible);
         layer_manager->Draw(text_window_layer_id);
+      } else if (msg->arg.timer.value == kNetTimer) {
+        __asm__("cli");
+        timer_manager->AddTimer(
+            Timer{msg->arg.timer.timeout + kTimer01Sec, kNetTimer, 1});
+        __asm__("sti");
+        net_timer_handler();
       }
       break;
     case Message::kKeyPush:
@@ -311,6 +321,11 @@ extern "C" void KernelMainNewStack(
       break;
     case Message::kInterruptE1000:
       e1000_intr();
+      break;
+    case Message::kNetInput:
+      __asm__("cli");
+      net_softirq_handler();
+      __asm__("sti");
       break;
     default:
       Log(kError, "Unknown message type: %d\n", msg->type);
