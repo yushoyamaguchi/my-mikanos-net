@@ -38,6 +38,14 @@ $ sudo ip link set tap0 up
 $ ./build.sh run
 ```
 
+起動後に MikanOS のターミナルで ifconfig を実行してIPアドレスを割り当てます。
+> ネットワークインタフェースは `net0` `net1` `net2` ... という名称が割り当てられます。
+
+```
+> ifconfig net0 192.0.2.2/24
+```
+IPアドレスと割り当てると ping へ応答できるようになります。
+
 ## アプリケーション
 
 + ifconfig
