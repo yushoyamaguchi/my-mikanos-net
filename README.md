@@ -2,6 +2,8 @@
 
 MikanOS にネットワーク機能を追加した改造版です。
 
+![ネットワーク機能のデモ](screenshot.gif)
+
 プロトコルスタックは https://github.com/pandax381/microps を移植しています。
 
 ## 事前準備
