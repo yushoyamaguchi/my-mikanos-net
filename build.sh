@@ -13,5 +13,5 @@ DISK_IMG=./disk.img MIKANOS_DIR=$PWD $HOME/osbook/devenv/make_mikanos_image.sh
 
 if [ "${1:-}" = "run" ]
 then
-  $HOME/osbook/devenv/run_image.sh ./disk.img
+  $HOME/osbook/devenv/run_image_net.sh ./disk.img
 fi
