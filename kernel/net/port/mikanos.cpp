@@ -157,8 +157,9 @@ softirq(void)
 void
 e1000_probe(void)
 {
+    debugf("probe start");
     for (int i = 0; i < pci::num_device; ++i) {
-        if (pci::ReadVendorId(pci::devices[i]) != 0x8086 || pci::ReadDeviceId(pci::devices[i]) != 0x10d3) {
+        if ( !(pci::devices[i].class_code.Match(0x02u, 0x00u, 0x00u))) {
             continue;
         }
         pci::Device *dev = &pci::devices[i];
