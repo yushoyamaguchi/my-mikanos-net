@@ -157,7 +157,6 @@ softirq(void)
 void
 e1000_probe(void)
 {
-    debugf("probe start");
     for (int i = 0; i < pci::num_device; ++i) {
         if ( !(pci::devices[i].class_code.Match(0x02u, 0x00u, 0x00u))) {
             continue;

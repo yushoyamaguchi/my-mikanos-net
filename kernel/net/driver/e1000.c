@@ -137,6 +137,7 @@ e1000_write(struct net_device *dev, const uint8_t *data, size_t len)
     e1000_reg_write(adapter, E1000_TDT, (tail + 1) % TX_RING_SIZE);
     while(!(desc->status & 0x0f)) {
         // busy wait
+        debugf("busy wait");//ここを抜くと固まる
     }
     return len;
 }
