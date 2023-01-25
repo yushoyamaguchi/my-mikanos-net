@@ -8,7 +8,7 @@
 set -ex
 
 #
-# usbを差し込んでdmsgコマンドを実行した結果、/dev/sdbになっていることを確認のうえ実行
+# usbを差し込んでfdisk -lコマンドを実行した結果、/dev/sdaになっていることを確認のうえ実行
 #
 USB=/dev/sda1
 KERNEL_ELF=/home/y-yamaguchi/yusho/mikanos-net/kernel/kernel.elf
